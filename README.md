@@ -46,31 +46,50 @@ The system ingests real-time IoT multi-modal telemetry (radar river stage, boreh
 
 ## 🛠️ System Architecture
 
-`
-┌────────────────────────────────────────────────────────────────────────┐
-│                      IoT & Satellite Data Layer                        │
-│   Radar Gauges  │  Inclinometers  │  Rain Gauges  │  Piezometers       │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ (Streaming Telemetry / REST API)
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                      VarunX Real-Time Core Engine                      │
-│   • Multi-Sensor Fusion & Normalization (Pydantic SensorSchemas)       │
-│   • 4-Tier ML Classifier (XGBoost GPU Hist + Random Forest)           │
-│   • Dynamic Hydrodynamic Evacuation Lead Time Model                    │
-└──────────────────┬─────────────────────────────────┬───────────────────┘
-                   │                                 │
-                   ▼                                 ▼
-┌──────────────────────────────────────┐ ┌───────────────────────────────┐
-│     Mission Control Dashboard        │ │    CAP Emergency Gateway      │
-│  • Live 10s Telemetry Fragment       │ │  • ITU-T CAP v1.2 XML Feed    │
-│  • 3D WebGL Valley Inundation Model  │ │  • NDRF / SDMA Alert Dispatch │
-│  • Plotly Carto GIS Catchment Map    │ │  • Multi-Channel Broadcast    │
-│  • Downstream Ward Response Matrix   │ │  • Siren / SMS Triggers       │
-└──────────────────────────────────────┘ └───────────────────────────────┘
-`
+```mermaid
+flowchart TD
+    %% Data Layer
+    IoT["🛰️ <b>IoT & Satellite Data Layer</b><br/><br/>Radar Gauges | Inclinometers | Rain Gauges | Piezometers"]
+    
+    %% Core Engine
+    Core["⚙️ <b>VarunX Real-Time Core Engine</b><br/><br/>• Multi-Sensor Fusion & Normalization (Pydantic SensorSchemas)<br/>• 4-Tier ML Classifier (XGBoost GPU Hist + Random Forest)<br/>• Dynamic Hydrodynamic Evacuation Lead Time Model"]
+    
+    %% Outputs
+    Dash["🖥️ <b>Mission Control Dashboard</b><br/><br/>• Live 10s Telemetry Fragment<br/>• 3D WebGL Valley Inundation Model<br/>• Plotly Carto GIS Catchment Map<br/>• Downstream Ward Response Matrix"]
+    
+    Gate["🚨 <b>CAP Emergency Gateway</b><br/><br/>• ITU-T CAP v1.2 XML Feed<br/>• NDRF / SDMA Alert Dispatch<br/>• Multi-Channel Broadcast<br/>• Siren / SMS Triggers"]
+
+    %% Routing
+    IoT -- "Streaming Telemetry / REST API" --> Core
+    
+    Core --> Dash
+    Core --> Gate
+
+    %% Styling
+    style IoT fill:#f8fafc,stroke:#3b82f6,stroke-width:2px,color:#0f172a
+    style Core fill:#fffbeb,stroke:#d97706,stroke-width:2px,color:#0f172a
+    style Dash fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#0f172a
+    style Gate fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#0f172a
+```
 
 ---
+
+### 🛰️ IoT & Satellite Data Layer
+*Radar Gauges | Inclinometers | Rain Gauges | Piezometers*
+↳ **Streaming Telemetry / REST API**
+
+### ⚙️ VarunX Real-Time Core Engine
+- **Multi-Sensor Fusion & Normalization** (`Pydantic SensorSchemas`)
+- **4-Tier ML Classifier** (`XGBoost GPU Hist` + `Random Forest`)
+- **Dynamic Hydrodynamic Evacuation Lead Time Model**
+
+### 📤 Downstream Systems
+| 🖥️ Mission Control Dashboard | 🚨 CAP Emergency Gateway |
+| :--- | :--- |
+| • Live 10s Telemetry Fragment | • ITU-T CAP v1.2 XML Feed |
+| • 3D WebGL Valley Inundation Model | • NDRF / SDMA Alert Dispatch |
+| • Plotly Carto GIS Catchment Map | • Multi-Channel Broadcast |
+| • Downstream Ward Response Matrix | • Siren / SMS Triggers |
 
 ## 💻 How to Deploy on ANY Machine
 
