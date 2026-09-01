@@ -72,3 +72,206 @@ flowchart TD
     style Gate fill:#f8f9fa,stroke:#adb5bd,stroke-width:1px,color:#212529
     
     linkStyle default stroke:#6c757d,stroke-width:1.5px
+```
+
+### 🛰️ IoT & Satellite Data Layer
+
+*Radar Gauges | Inclinometers | Rain Gauges | Piezometers*
+↳ **Streaming Telemetry / REST API**
+
+### ⚙️ VarunX Real-Time Core Engine
+
+* **Multi-Sensor Fusion & Normalization** (`Pydantic SensorSchemas`)
+* **4-Tier ML Classifier** (`XGBoost GPU Hist` + `Random Forest`)
+* **Dynamic Hydrodynamic Evacuation Lead Time Model**
+
+### 📤 Downstream Systems
+
+| 🖥️ Mission Control Dashboard | 🚨 CAP Emergency Gateway |
+| --- | --- |
+| • Live 10s Telemetry Fragment | • ITU-T CAP v1.2 XML Feed |
+| • 3D WebGL Valley Inundation Model | • NDRF / SDMA Alert Dispatch |
+| • Plotly Carto GIS Catchment Map | • Multi-Channel Broadcast |
+| • Downstream Ward Response Matrix | • Siren / SMS Triggers |
+
+---
+
+## 💻 How to Deploy on ANY Machine
+
+### Prerequisites
+
+* **Python:** Python 3.9, 3.10, 3.11, or 3.12 installed.
+* **Git:** Installed on your system.
+* **Hardware:** Runs on any standard CPU (Windows / Linux / macOS). *Optional: NVIDIA GPU with CUDA for accelerated model retraining.*
+
+---
+
+### Option 1: Quick Start (Windows)
+
+1. **Clone the Repository:**
+
+```powershell
+git clone [https://github.com/RougeVader/VarunaX.git](https://github.com/RougeVader/VarunaX.git)
+cd VarunaX
+```
+
+2. **Create and Activate a Virtual Environment:**
+
+```powershell
+python -m venv varunx_env
+.\varunx_env\Scripts\Activate.ps1
+```
+
+*(If script execution is disabled in PowerShell, run: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`)*
+
+3. **Install Dependencies:**
+
+```powershell
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+4. **Launch the Application:**
+
+```powershell
+streamlit run app.py
+```
+
+*The dashboard will automatically open in your default browser at http://localhost:8501.*
+
+---
+
+### Option 2: Linux (Ubuntu / Debian / CentOS)
+
+1. **Clone and Navigate:**
+
+```bash
+git clone [https://github.com/RougeVader/VarunaX.git](https://github.com/RougeVader/VarunaX.git)
+cd VarunaX
+```
+
+2. **Set Up Python Virtual Environment:**
+
+```bash
+sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv
+python3 -m venv varunx_env
+source varunx_env/bin/activate
+```
+
+3. **Install Requirements & Run:**
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+```
+
+---
+
+### Option 3: macOS (Apple Silicon M1/M2/M3 & Intel)
+
+1. **Clone and Setup:**
+
+```bash
+git clone [https://github.com/RougeVader/VarunaX.git](https://github.com/RougeVader/VarunaX.git)
+cd VarunaX
+python3 -m venv varunx_env
+source varunx_env/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+2. **Run:**
+
+```bash
+streamlit run app.py
+```
+
+---
+
+### Option 4: Docker Deployment
+
+1. **Build the Docker Image:**
+
+```bash
+docker build -t varunx-ews .
+```
+
+2. **Run the Container:**
+
+```bash
+docker run -p 8501:8501 varunx-ews
+```
+
+*Access at http://localhost:8501.*
+
+---
+
+## 🧠 Machine Learning Model Training
+
+The repository includes pre-trained production models in `models/`. To re-train the models with custom hyperparameter tuning or GPU acceleration:
+
+```bash
+python train_model.py
+```
+
+### Features used in ML Training (10 Core Parameters):
+
+* `rainfall_1h_mm` & `rainfall_24h_mm` (Precipitation accumulation)
+* `flow_water_level_m` & `discharge_m3s` (Hydrodynamic stage & flow)
+* `slope_movement_mm` & `soil_moisture_pct` (Geotechnical instability)
+* `pore_water_pressure_kpa` & `surface_temp_c` (Subsurface saturation & snowmelt)
+* `turbidity_ntu` & `glacier_lake_area_change_pct` (Sediment surge & moraine dam expansion)
+
+---
+
+## 📂 Repository Structure
+
+```text
+VarunaX/
+├── .streamlit/
+│   └── config.toml
+├── data/
+│   ├── glacial_lakes_inventory/
+│   ├── alerts_history.json
+│   └── historical_varunx_data.csv
+├── models/
+│   ├── feature_cols.pkl
+│   ├── metrics.json
+│   ├── varunx_risk_model.pkl
+│   └── varunx_risk_model_rf.pkl
+├── schemas/
+│   └── sensor_data.py
+├── utils/
+│   ├── alert_dispatcher.py
+│   ├── data_generator.py
+│   ├── gis_mapper.py
+│   └── telemetry_stream.py
+├── app.py
+├── document.txt
+├── README.md
+├── requirements.txt
+└── train_model.py
+```
+
+### Module Breakdown
+
+| Component | Type | Description |
+| --- | --- | --- |
+| **`app.py`** | Application | Main Streamlit dashboard application and UI fragments. |
+| **`train_model.py`** | Pipeline | ML model training pipeline (XGBoost + Random Forest). |
+| **`utils/`** | Services | Core modules for asynchronous telemetry, GIS mapping, and CAP alert dispatching. |
+| **`schemas/`** | Data Models | Pydantic validation schemas for real-time sensor data. |
+| **`models/`** | Artifacts | Compiled production risk classifiers and performance metrics. |
+| **`data/`** | Storage | Historical telemetry, live alert logs, and high-risk lake shapefiles. |
+| **`document.txt`** | Documentation | In-depth comprehensive guide for judges and technical panels. |
+| **`requirements.txt`** | Config | Python environment and package dependencies. |
+
+---
+
+## 👥 Team & Acknowledgments
+
+* **Project:** VarunX (VarunaX) Disaster Early Warning System
+* **Hackathon:** Smart India Hackathon (SIH) 2026
+* **Problem Code:** SIH26192
+* **Target Organization:** Ministry of Home Affairs (MHA), National Disaster Response Force (NDRF), National Disaster Management Authority (NDMA).
