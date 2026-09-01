@@ -1,0 +1,178 @@
+================================================================================
+VarunX EARLY WARNING SYSTEM - ML MODEL TRAINING GUIDE (SIH26192)
+Ministry of Home Affairs — NDRF, DM Division
+================================================================================
+
+This document provides complete instructions and executable Python code for training
+the XGBoost and RandomForest VarunX Risk Classification models on a separate system or GPU server.
+
+--------------------------------------------------------------------------------
+1. PREREQUISITES & ENVIRONMENT SETUP
+--------------------------------------------------------------------------------
+Ensure the following Python packages are installed:
+
+pip install pandas numpy scikit-learn xgboost joblib pydantic
+
+--------------------------------------------------------------------------------
+2. VARUNX OFFICIAL FEATURE MATRIX (10 PARAMETERS)
+--------------------------------------------------------------------------------
+Derived from VarunX PRD Section 8 (SIH26192):
+
+1. rainfall_1h_mm       : 1-hour rainfall intensity (mm/h)
+2. rainfall_3h_mm       : 3-hour cumulative rainfall (mm)
+3. rainfall_24h_mm      : 24-hour cumulative rainfall (mm)
+4. flow_water_level_m   : River flow / water level (m)
+5. water_level_rate_m_h : Rate of flow level change (m/h)
+6. slope_movement_mm    : Slope displacement / movement (mm)
+7. tilt_rate_mm_h       : Rate of slope displacement (mm/h)
+8. discharge_m3s        : Water discharge rate (m³/s)
+9. air_temp_c           : Air temperature (°C)
+10. surface_temp_c      : Surface / Ground temperature (°C)
+
+Target Variable:
+risk_level : 0 (Low), 1 (Medium), 2 (High), 3 (Critical)
+
+--------------------------------------------------------------------------------
+3. FULL EXECUTABLE TRAINING CODE (train_model.py)
+--------------------------------------------------------------------------------
+
+import os
+import json
+import joblib
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score
+import xgboost as xgb
+
+def generate_historical_data(n_samples=2500, seed=42):
+    np.random.seed(seed)
+    data = []
+    
+    for i in range(n_samples):
+        risk_level = np.random.choice([0, 1, 2, 3], p=[0.45, 0.30, 0.18, 0.07])
+        
+        if risk_level == 0:
+            flow_level = np.random.normal(3.5, 0.8)
+            slope_movement = np.random.normal(1.2, 0.5)
+            discharge = np.random.normal(30, 8)
+            rainfall_1h = np.random.exponential(3)
+            rainfall_3h = rainfall_1h * np.random.uniform(1.8, 2.5)
+            rainfall_24h = rainfall_3h * np.random.uniform(2.0, 3.5)
+            air_temp = np.random.normal(12, 4)
+            surface_temp = air_temp - np.random.uniform(0.5, 2.0)
+        elif risk_level == 1:
+            flow_level = np.random.normal(6.5, 1.2)
+            slope_movement = np.random.normal(6.0, 2.0)
+            discharge = np.random.normal(75, 15)
+            rainfall_1h = np.random.exponential(10)
+            rainfall_3h = rainfall_1h * np.random.uniform(2.0, 2.8)
+            rainfall_24h = rainfall_3h * np.random.uniform(2.5, 4.0)
+            air_temp = np.random.normal(10, 3)
+            surface_temp = air_temp - np.random.uniform(0.5, 1.8)
+        elif risk_level == 2:
+            flow_level = np.random.normal(11.0, 2.0)
+            slope_movement = np.random.normal(25.0, 8.0)
+            discharge = np.random.normal(180, 35)
+            rainfall_1h = np.random.exponential(25)
+            rainfall_3h = rainfall_1h * np.random.uniform(2.2, 3.0)
+            rainfall_24h = rainfall_3h * np.random.uniform(2.8, 4.5)
+            air_temp = np.random.normal(7, 3)
+            surface_temp = air_temp - np.random.uniform(0.5, 1.5)
+        else:
+            flow_level = np.random.normal(16.5, 2.5)
+            slope_movement = np.random.normal(75.0, 20.0)
+            discharge = np.random.normal(380, 70)
+            rainfall_1h = np.random.exponential(45)
+            rainfall_3h = rainfall_1h * np.random.uniform(2.5, 3.5)
+            rainfall_24h = rainfall_3h * np.random.uniform(3.0, 5.0)
+            air_temp = np.random.normal(4, 2.5)
+            surface_temp = air_temp - np.random.uniform(0.2, 1.2)
+            
+        water_level_rate = round(float(np.random.normal(0.05, 0.15) + (risk_level * 0.35)), 3)
+        tilt_rate = round(slope_movement * float(np.random.uniform(0.05, 0.25)), 3)
+        
+        row = {
+            "rainfall_1h_mm": round(max(0, rainfall_1h), 1),
+            "rainfall_3h_mm": round(max(rainfall_1h, rainfall_3h), 1),
+            "rainfall_24h_mm": round(max(rainfall_3h, rainfall_24h), 1),
+            "flow_water_level_m": round(max(0.5, flow_level), 2),
+            "water_level_rate_m_h": water_level_rate,
+            "slope_movement_mm": round(max(0, slope_movement), 1),
+            "tilt_rate_mm_h": tilt_rate,
+            "discharge_m3s": round(max(2.0, discharge), 1),
+            "air_temp_c": round(air_temp, 1),
+            "surface_temp_c": round(surface_temp, 1),
+            "risk_level": risk_level
+        }
+        data.append(row)
+        
+    return pd.DataFrame(data)
+
+def train_and_export():
+    print("Generating/loading VarunX training dataset...")
+    df = generate_historical_data(2500)
+    
+    feature_cols = [
+        "rainfall_1h_mm", "rainfall_3h_mm", "rainfall_24h_mm",
+        "flow_water_level_m", "water_level_rate_m_h",
+        "slope_movement_mm", "tilt_rate_mm_h",
+        "discharge_m3s", "air_temp_c", "surface_temp_c"
+    ]
+    
+    X = df[feature_cols]
+    y = df["risk_level"]
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    
+    # XGBoost Model
+    model = xgb.XGBClassifier(
+        n_estimators=120, max_depth=5, learning_rate=0.1,
+        subsample=0.8, colsample_bytree=0.8, random_state=42, eval_metric="mlogloss"
+    )
+    model.fit(X_train, y_train)
+    
+    y_pred = model.predict(X_test)
+    y_proba = model.predict_proba(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    cm = confusion_matrix(y_test, y_pred).tolist()
+    report = classification_report(y_test, y_pred, target_names=["Low", "Medium", "High", "Critical"], output_dict=True)
+    
+    # Backup RandomForest
+    rf = RandomForestClassifier(n_estimators=100, max_depth=6, random_state=42)
+    rf.fit(X_train, y_train)
+    
+    # Save artifacts
+    os.makedirs("models", exist_ok=True)
+    joblib.dump(model, "models/glof_risk_model.pkl")
+    joblib.dump(rf, "models/glof_risk_model_rf.pkl")
+    joblib.dump(feature_cols, "models/feature_cols.pkl")
+    
+    metrics_data = {
+        "accuracy": round(float(acc), 4),
+        "roc_auc": round(float(roc_auc_score(y_test, y_proba, multi_class="ovr")), 4),
+        "confusion_matrix": cm,
+        "classification_report": report,
+        "feature_importances": pd.DataFrame({"feature": feature_cols, "importance": model.feature_importances_}).to_dict(orient="records")
+    }
+    
+    with open("models/metrics.json", "w") as f:
+        json.dump(metrics_data, f, indent=2)
+        
+    print("VarunX Model Training complete! Artifacts saved to models/")
+
+if __name__ == "__main__":
+    train_and_export()
+
+--------------------------------------------------------------------------------
+4. DEPLOYMENT INSTRUCTIONS
+--------------------------------------------------------------------------------
+1. Run this script on your training server.
+2. Copy the resulting files from the `models/` directory into your project's `glof_ews/models/` directory:
+   - `models/glof_risk_model.pkl`
+   - `models/glof_risk_model_rf.pkl`
+   - `models/feature_cols.pkl`
+   - `models/metrics.json`
+3. Launch Streamlit app (`streamlit run app.py`).
+================================================================================
