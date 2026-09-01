@@ -44,20 +44,20 @@ The system ingests real-time IoT multi-modal telemetry (radar river stage, boreh
 
 ---
 
-## 🛠️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
     %% Data Layer
-    IoT["🛰️ <b>IoT & Satellite Data Layer</b><br/><br/>Radar Gauges | Inclinometers | Rain Gauges | Piezometers"]
+    IoT["<b>IoT & Satellite Data Layer</b><br/><br/>Radar Gauges | Inclinometers | Rain Gauges | Piezometers"]
     
     %% Core Engine
-    Core["⚙️ <b>VarunX Real-Time Core Engine</b><br/><br/>• Multi-Sensor Fusion & Normalization (Pydantic SensorSchemas)<br/>• 4-Tier ML Classifier (XGBoost GPU Hist + Random Forest)<br/>• Dynamic Hydrodynamic Evacuation Lead Time Model"]
+    Core["<b>VarunX Real-Time Core Engine</b><br/><br/>• Multi-Sensor Fusion & Normalization (Pydantic)<br/>• 4-Tier ML Classifier (XGBoost GPU Hist + Random Forest)<br/>• Dynamic Hydrodynamic Evacuation Lead Time Model"]
     
     %% Outputs
-    Dash["🖥️ <b>Mission Control Dashboard</b><br/><br/>• Live 10s Telemetry Fragment<br/>• 3D WebGL Valley Inundation Model<br/>• Plotly Carto GIS Catchment Map<br/>• Downstream Ward Response Matrix"]
+    Dash["<b>Mission Control Dashboard</b><br/><br/>• Live 10s Telemetry Fragment<br/>• 3D WebGL Valley Inundation Model<br/>• Plotly Carto GIS Catchment Map<br/>• Downstream Ward Response Matrix"]
     
-    Gate["🚨 <b>CAP Emergency Gateway</b><br/><br/>• ITU-T CAP v1.2 XML Feed<br/>• NDRF / SDMA Alert Dispatch<br/>• Multi-Channel Broadcast<br/>• Siren / SMS Triggers"]
+    Gate["<b>CAP Emergency Gateway</b><br/><br/>• ITU-T CAP v1.2 XML Feed<br/>• NDRF / SDMA Alert Dispatch<br/>• Multi-Channel Broadcast<br/>• Siren / SMS Triggers"]
 
     %% Routing
     IoT -- "Streaming Telemetry / REST API" --> Core
@@ -65,13 +65,13 @@ flowchart TD
     Core --> Dash
     Core --> Gate
 
-    %% Styling
-    style IoT fill:#f8fafc,stroke:#3b82f6,stroke-width:2px,color:#0f172a
-    style Core fill:#fffbeb,stroke:#d97706,stroke-width:2px,color:#0f172a
-    style Dash fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#0f172a
-    style Gate fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#0f172a
-```
-
+    %% Styling (Professional Minimalist Theme)
+    style IoT fill:#f8f9fa,stroke:#adb5bd,stroke-width:1px,color:#212529
+    style Core fill:#e9ecef,stroke:#6c757d,stroke-width:2px,color:#212529
+    style Dash fill:#f8f9fa,stroke:#adb5bd,stroke-width:1px,color:#212529
+    style Gate fill:#f8f9fa,stroke:#adb5bd,stroke-width:1px,color:#212529
+    
+    linkStyle default stroke:#6c757d,stroke-width:1.5px
 ---
 
 ### 🛰️ IoT & Satellite Data Layer
@@ -206,35 +206,35 @@ ainfall_24h_mm (Precipitation accumulation)
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
-`
+For a clean, professional README, it is best practice to separate the visual directory tree from the detailed file descriptions. This prevents line-wrapping issues on smaller screens and keeps the documentation highly readable.
+
+```text
 VarunaX/
-├── app.py                     # Main Streamlit Dashboard Application & Fragments
-├── train_model.py             # ML Model Training Pipeline (XGBoost + Random Forest)
-├── document.txt               # In-Depth Comprehensive Guide for Judges & Technical Panels
-├── requirements.txt           # Python Package Dependencies
-├── README.md                  # Project Documentation & Multi-Platform Deployment
 ├── .streamlit/
-│   └── config.toml           # Streamlit Configuration (Dark Theme & Port Settings)
+│   └── config.toml
 ├── data/
-│   ├── historical_varunx_data.csv   # Historical Training Dataset
-│   ├── alerts_history.json          # Live Dispatched Alert Logs
-│   └── glacial_lakes_inventory/     # Shapefiles of High-Risk Himalayan Lakes
+│   ├── glacial_lakes_inventory/
+│   ├── alerts_history.json
+│   └── historical_varunx_data.csv
 ├── models/
-│   ├── varunx_risk_model.pkl        # Production XGBoost Classifier
-│   ├── varunx_risk_model_rf.pkl     # Production Random Forest Classifier
-│   ├── feature_cols.pkl             # Feature Columns Metadata
-│   └── metrics.json                 # Model Performance Evaluation Metrics
+│   ├── feature_cols.pkl
+│   ├── metrics.json
+│   ├── varunx_risk_model.pkl
+│   └── varunx_risk_model_rf.pkl
 ├── schemas/
-│   └── sensor_data.py         # Pydantic Schemas & Data Validation Models
-└── utils/
-    ├── alert_dispatcher.py    # ITU-T CAP v1.2 XML & Emergency Broadcast Gateway
-    ├── data_generator.py      # Stochastic Physics-Based Telemetry Generator
-    ├── gis_mapper.py          # Spatial Cartography & GeoJSON Layer Builder
-    └── telemetry_stream.py    # Autonomous Async Data Stream Manager
-`
-
+│   └── sensor_data.py
+├── utils/
+│   ├── alert_dispatcher.py
+│   ├── data_generator.py
+│   ├── gis_mapper.py
+│   └── telemetry_stream.py
+├── app.py
+├── document.txt
+├── README.md
+├── requirements.txt
+└── train_model.py
 ---
 
 ## 👥 Team & Acknowledgments
