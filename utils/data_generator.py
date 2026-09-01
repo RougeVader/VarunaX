@@ -56,7 +56,7 @@ def generate_historical_data(n_samples=2500, seed=42):
             air_temp = np.random.normal(7, 3)
             surface_temp = air_temp - np.random.uniform(0.5, 1.5)
             
-        else:  # Critical risk - imminent outburst / landslide
+        else:  # Critical risk - imminent flash flood surge / hillside landslide
             flow_level = np.random.normal(16.5, 2.5)
             slope_movement = np.random.normal(75.0, 20.0)
             discharge = np.random.normal(380, 70)
@@ -79,8 +79,8 @@ def generate_historical_data(n_samples=2500, seed=42):
         row = {
             "timestamp": base_time + timedelta(hours=i*6),
             "catchment_zone": np.random.choice([
-                "Kedarnath_Valley", "Teesta_Basin", "Solukhumbu_Catchment",
-                "Rolwaling_Valley", "Lahaul_Spiti"
+                "Kedarnath_Valley", "Teesta_Basin", "Alaknanda_Chamoli",
+                "Beas_Kullu_Valley", "Lahaul_Spiti"
             ]),
             "rainfall_1h_mm": round(rainfall_1h, 1),
             "rainfall_3h_mm": round(rainfall_3h, 1),
@@ -102,6 +102,6 @@ def generate_historical_data(n_samples=2500, seed=42):
 if __name__ == "__main__":
     df = generate_historical_data(2500)
     os.makedirs("data", exist_ok=True)
-    df.to_csv("data/historical_glof_data.csv", index=False)
+    df.to_csv("data/historical_varunx_data.csv", index=False)
     print(f"Generated {len(df)} VarunX samples")
     print(df["risk_level"].value_counts().sort_index())

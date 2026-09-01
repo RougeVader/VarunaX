@@ -28,7 +28,7 @@ def train():
     print("=" * 60)
     
     # Generate or load data
-    data_path = "data/historical_glof_data.csv"
+    data_path = "data/historical_varunx_data.csv"
     print("Generating synthetic historical dataset for VarunX parameters...")
     df = generate_historical_data(2500)
     os.makedirs("data", exist_ok=True)
@@ -60,18 +60,36 @@ def train():
         X, y, test_size=0.2, random_state=42, stratify=y
     )
     
+    # Check GPU availability (NVIDIA RTX 3050)
+    xgb_kwargs = {
+        "n_estimators": 120,
+        "max_depth": 5,
+        "learning_rate": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "random_state": 42,
+        "eval_metric": "mlogloss"
+    }
+    try:
+        import torch
+        if torch.cuda.is_available():
+            print(f"\n[GPU ACCELERATION] Utilizing NVIDIA GPU ({torch.cuda.get_device_name(0)}) for training...")
+            xgb_kwargs["tree_method"] = "hist"
+            xgb_kwargs["device"] = "cuda"
+    except Exception:
+        pass
+
     # Train XGBoost Classifier
     print("\nTraining XGBoost Classifier on VarunX parameters...")
-    model = xgb.XGBClassifier(
-        n_estimators=120,
-        max_depth=5,
-        learning_rate=0.1,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        random_state=42,
-        eval_metric="mlogloss"
-    )
-    model.fit(X_train, y_train)
+    model = xgb.XGBClassifier(**xgb_kwargs)
+    try:
+        model.fit(X_train, y_train)
+    except Exception as e:
+        print(f"GPU fit fallback to CPU due to: {e}")
+        xgb_kwargs.pop("device", None)
+        xgb_kwargs.pop("tree_method", None)
+        model = xgb.XGBClassifier(**xgb_kwargs)
+        model.fit(X_train, y_train)
     
     # Evaluate
     y_pred = model.predict(X_test)
@@ -100,8 +118,8 @@ def train():
     
     # Save model artifacts
     os.makedirs("models", exist_ok=True)
-    joblib.dump(model, "models/glof_risk_model.pkl")
-    joblib.dump(rf, "models/glof_risk_model_rf.pkl")
+    joblib.dump(model, "models/varunx_risk_model.pkl")
+    joblib.dump(rf, "models/varunx_risk_model_rf.pkl")
     joblib.dump(feature_cols, "models/feature_cols.pkl")
     
     # Export metrics JSON for Streamlit ML Studio
@@ -120,9 +138,9 @@ def train():
     with open("models/metrics.json", "w", encoding="utf-8") as f:
         json.dump(metrics_data, f, indent=2)
     
-    print("\n✅ VarunX Models & Metrics saved to models/")
-    print("   - glof_risk_model.pkl (XGBoost)")
-    print("   - glof_risk_model_rf.pkl (RandomForest)")
+    print("\n[SUCCESS] VarunX Models & Metrics saved to models/")
+    print("   - varunx_risk_model.pkl (XGBoost)")
+    print("   - varunx_risk_model_rf.pkl (RandomForest)")
     print("   - feature_cols.pkl")
     print("   - metrics.json")
     

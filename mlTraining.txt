@@ -145,8 +145,8 @@ def train_and_export():
     
     # Save artifacts
     os.makedirs("models", exist_ok=True)
-    joblib.dump(model, "models/glof_risk_model.pkl")
-    joblib.dump(rf, "models/glof_risk_model_rf.pkl")
+    joblib.dump(model, "models/varunx_risk_model.pkl")
+    joblib.dump(rf, "models/varunx_risk_model_rf.pkl")
     joblib.dump(feature_cols, "models/feature_cols.pkl")
     
     metrics_data = {
@@ -169,9 +169,9 @@ if __name__ == "__main__":
 4. DEPLOYMENT INSTRUCTIONS
 --------------------------------------------------------------------------------
 1. Run this script on your training server.
-2. Copy the resulting files from the `models/` directory into your project's `glof_ews/models/` directory:
-   - `models/glof_risk_model.pkl`
-   - `models/glof_risk_model_rf.pkl`
+2. Copy the resulting files from the `models/` directory into your project's `VArunX/models/` directory:
+   - `models/varunx_risk_model.pkl`
+   - `models/varunx_risk_model_rf.pkl`
    - `models/feature_cols.pkl`
    - `models/metrics.json`
 3. Launch Streamlit app (`streamlit run app.py`).

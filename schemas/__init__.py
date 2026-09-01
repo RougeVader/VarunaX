@@ -1,5 +1,5 @@
 """
-Schemas package for GLOF Early Warning System.
+Schemas package for VarunX - Flash Flood & Landslide Early Warning System.
 """
 from .sensor_data import SensorReading, RiskPrediction, AlertPayload
 

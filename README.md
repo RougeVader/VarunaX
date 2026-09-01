@@ -1,69 +1,225 @@
-# 🏔️ VarunX: AI & IoT-Powered Early Warning System for Flash Floods & Landslides in Hilly Regions
-### Smart India Hackathon 2026 Prototype · Problem Statement ID: SIH26192
-**Organization:** Ministry of Home Affairs — NDRF, DM Division | **Theme:** Disaster Management
+# 🏔️ VarunX (VarunaX) — Early Warning System (EWS)
+### AI & IoT-Powered Flash Flood & Landslide Risk Prediction for Hilly Regions
+**SIH Problem Statement:** SIH26192 • **Ministry:** Ministry of Home Affairs (NDRF, Disaster Management Division)
 
 ---
 
-## 📌 Overview
-**VarunX** is an AI and IoT-enabled early-warning software platform designed to mitigate flash flood and landslide disasters across vulnerable hilly catchments in India. It continuously ingests multi-source telemetry (rainfall intensity, flow/water level, slope movement, discharge) and predicts hyper-local village/ward-level risk levels (*Low, Medium, High, Critical*) alongside actionable evacuation lead times.
+## 📌 Executive Summary
+**VarunX** is an end-to-end mission-critical Early Warning System (EWS) designed to protect vulnerable Himalayan and mountainous communities from Glacial Lake Outburst Floods (GLOFs), flash floods, cloudbursts, and debris flow landslides.
+
+The system ingests real-time IoT multi-modal telemetry (radar river stage, borehole inclinometer slope displacement, optical rain gauges, pore water pressure, soil moisture, turbidity), executes a 4-tier ML Risk Classifier (**Ensemble XGBoost + Random Forest** trained on CUDA GPU), computes dynamic evacuation lead times, renders an interactive **3D WebGL Valley Inundation Model**, and dispatches automated **ITU-T X.1303 Common Alerting Protocol (CAP v1.2 XML)** emergency broadcasts to NDRF, SDMA, and civil authorities.
 
 ---
 
-## ✅ Key Deliverables (Matching PRD 6.1 – 6.6)
-- **Live Monitoring Dashboard**: Real-time sensor controls, rate of change indicators, risk scoring, and lead time estimation.
-- **3D Valley & Slope Risk Model**: Interactive 3D Plotly valley terrain depicting river inundation and slope displacement zones.
-- **Interactive GIS Catchment Map**: Geo-map plotting hilly catchments, live threat levels, and downstream ward vulnerabilities.
-- **Historical Event Replay**: One-click replay of past historical flash flood and landslide events.
-- **Vulnerable Zone Inventory**: Searchable inventory of vulnerable hilly zones with direct monitor hand-off.
-- **Emergency Alert Gateway**: Multi-channel alert broadcast system (SMS, Email, Webhook, CAP XML for NDRF).
+## 🚀 Key Features
+
+1. **🔴 Live Telemetry & Mission Control Engine (@st.fragment):**
+   - Autonomous 10-second real-time streaming engine with persistent state.
+   - Dual Mode: **Auto Simulation Mode** (dynamic stochastic hydrographs & rainstorms) and **Manual Scenario Override** (test extreme flood/landslide conditions live).
+   - High-contrast tactical dark theme with CSS custom properties.
+
+2. **🏔️ 3D Valley Terrain & Inundation Model (Three.js WebGL):**
+   - High-fidelity 3D canyon topography with natural Himalayan elevation shading.
+   - **Slope-Constrained Inundation Surface:** Water volume dynamically rises and expands along the physical contours of the mountain slopes without clipping.
+   - **Raycasted Interactive 3D IoT Pins:** Hover over sensor nodes (S-01, S-07, Ward Hub, S-10) to view live telemetry HUD inspection cards.
+   - **Persistent Viewport Memory:** Zoom, tilt, and pan angles are saved across 10-second refreshes.
+   - **Active Landslide Slip Plane:** Visualizes glowing geotechnical failure scarps when slope displacement exceeds hazard thresholds.
+
+3. **🗺️ Interactive GIS Spatial Map (Plotly Carto Dark):**
+   - Visualizes critical catchment basins across Uttarakhand, Himachal Pradesh, Sikkim, and J&K (e.g., Kedarnath Valley / Mandakini Catchment).
+   - Shows IoT sensor network coordinates, vulnerable downstream civil wards, high-risk moraine dams, and primary evacuation safe zones.
+
+4. **⚡ 4-Tier ML Risk Classification & Lead Time Engine:**
+   - Classifies risk into **Green (Normal)**, **Yellow (Advisory)**, **Orange (Warning)**, and **Red (Critical Emergency)**.
+   - Calculates **Dynamic Evacuation Lead Time** using hydrodynamic catchment lag, Manning’s river channel velocity, and hydraulic distance.
+   - Downstream Vulnerable Ward Impact & Response table with estimated time-to-impact and assigned evacuation centers.
+
+5. **📢 ITU-T CAP v1.2 Emergency Alert Gateway:**
+   - Formats and dispatches standard XML alerts compliant with ITU-T Recommendation X.1303 (compatible with NDMA Sachet, SDMA, and NDRF quick response).
+   - Multi-channel dispatch: Emergency SMS, Broadcast Sirens, CAP XML, and WhatsApp Community Beacon.
+
+6. **🔬 Offline Batch Diagnostic Hub & Analytics:**
+   - Upload CSV/JSON field logs for high-throughput batch inference.
+   - Correlation heatmaps, feature importance breakdown, and audit logs.
 
 ---
 
-## 🚀 How to Run (3 Steps)
+## 🛠️ System Architecture
 
-### 1. Install Dependencies
-```bash
-cd glof_ews
-pip install -r requirements.txt
-```
-
-### 2. Launch Dashboard
-```bash
-streamlit run app.py
-```
-App opens in browser at `http://localhost:8501`.
+`
+┌────────────────────────────────────────────────────────────────────────┐
+│                      IoT & Satellite Data Layer                        │
+│   Radar Gauges  │  Inclinometers  │  Rain Gauges  │  Piezometers       │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ (Streaming Telemetry / REST API)
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                      VarunX Real-Time Core Engine                      │
+│   • Multi-Sensor Fusion & Normalization (Pydantic SensorSchemas)       │
+│   • 4-Tier ML Classifier (XGBoost GPU Hist + Random Forest)           │
+│   • Dynamic Hydrodynamic Evacuation Lead Time Model                    │
+└──────────────────┬─────────────────────────────────┬───────────────────┘
+                   │                                 │
+                   ▼                                 ▼
+┌──────────────────────────────────────┐ ┌───────────────────────────────┐
+│     Mission Control Dashboard        │ │    CAP Emergency Gateway      │
+│  • Live 10s Telemetry Fragment       │ │  • ITU-T CAP v1.2 XML Feed    │
+│  • 3D WebGL Valley Inundation Model  │ │  • NDRF / SDMA Alert Dispatch │
+│  • Plotly Carto GIS Catchment Map    │ │  • Multi-Channel Broadcast    │
+│  • Downstream Ward Response Matrix   │ │  • Siren / SMS Triggers       │
+└──────────────────────────────────────┘ └───────────────────────────────┘
+`
 
 ---
 
-## 📁 Project Architecture
-```
-glof_ews/
-├── app.py                      # Main VarunX 5-tab Streamlit dashboard
-├── mlTraining.txt              # Standalone external GPU model training guide
-├── requirements.txt            # Project dependencies
-├── schemas/
-│   ├── __init__.py
-│   └── sensor_data.py          # Pydantic schemas (SensorReading, AlertPayload)
-├── utils/
-│   ├── alert_dispatcher.py     # Multi-channel alert gateway (NDRF / SDMA)
-│   ├── gis_mapper.py           # Plotly spatial GIS catchment mapper
-│   ├── telemetry_stream.py     # Open-Meteo weather API & sensor stream tick generator
-│   └── data_generator.py       # Synthetic training data generator
+## 💻 How to Deploy on ANY Machine
+
+### Prerequisites
+- **Python:** Python 3.9, 3.10, 3.11, or 3.12 installed.
+- **Git:** Installed on your system.
+- **Hardware:** Runs on any standard CPU (Windows / Linux / macOS). *Optional: NVIDIA GPU with CUDA for accelerated model retraining.*
+
+---
+
+### Option 1: Quick Start (Windows)
+
+1. **Clone the Repository:**
+   `powershell
+   git clone https://github.com/RougeVader/VarunaX.git
+   cd VarunaX
+   `
+
+2. **Create and Activate a Virtual Environment:**
+   `powershell
+   python -m venv varunx_env
+   .arunx_env\Scripts\Activate.ps1
+   `
+   *(If script execution is disabled in PowerShell, run: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass)*
+
+3. **Install Dependencies:**
+   `powershell
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   `
+
+4. **Launch the Application:**
+   `powershell
+   streamlit run app.py
+   `
+   The dashboard will automatically open in your default browser at http://localhost:8501.
+
+---
+
+### Option 2: Linux (Ubuntu / Debian / CentOS)
+
+1. **Clone and Navigate:**
+   `ash
+   git clone https://github.com/RougeVader/VarunaX.git
+   cd VarunaX
+   `
+
+2. **Set Up Python Virtual Environment:**
+   `ash
+   sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv
+   python3 -m venv varunx_env
+   source varunx_env/bin/activate
+   `
+
+3. **Install Requirements & Run:**
+   `ash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+   `
+
+---
+
+### Option 3: macOS (Apple Silicon M1/M2/M3 & Intel)
+
+1. **Clone and Setup:**
+   `ash
+   git clone https://github.com/RougeVader/VarunaX.git
+   cd VarunaX
+   python3 -m venv varunx_env
+   source varunx_env/bin/activate
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   `
+
+2. **Run:**
+   `ash
+   streamlit run app.py
+   `
+
+---
+
+### Option 4: Docker Deployment
+
+1. **Build the Docker Image:**
+   `ash
+   docker build -t varunx-ews .
+   `
+
+2. **Run the Container:**
+   `ash
+   docker run -p 8501:8501 varunx-ews
+   `
+   Access at http://localhost:8501.
+
+---
+
+## 🧠 Machine Learning Model Training
+
+The repository includes pre-trained production models in models/. To re-train the models with custom hyperparameter tuning or GPU acceleration:
+
+`ash
+python train_model.py
+`
+
+### Features used in ML Training (10 Core Parameters):
+- 
+ainfall_1h_mm & 
+ainfall_24h_mm (Precipitation accumulation)
+- low_water_level_m & discharge_m3s (Hydrodynamic stage & flow)
+- slope_movement_mm & soil_moisture_pct (Geotechnical instability)
+- pore_water_pressure_kpa & surface_temp_c (Subsurface saturation & snowmelt)
+- 	urbidity_ntu & glacier_lake_area_change_pct (Sediment surge & moraine dam expansion)
+
+---
+
+## 📂 Repository Structure
+
+`
+VarunaX/
+├── app.py                     # Main Streamlit Dashboard Application & Fragments
+├── train_model.py             # ML Model Training Pipeline (XGBoost + Random Forest)
+├── document.txt               # In-Depth Comprehensive Guide for Judges & Technical Panels
+├── requirements.txt           # Python Package Dependencies
+├── README.md                  # Project Documentation & Multi-Platform Deployment
+├── .streamlit/
+│   └── config.toml           # Streamlit Configuration (Dark Theme & Port Settings)
 ├── data/
-│   ├── historical_glof_data.csv # Past event data
-│   └── alerts_history.json     # Audit log for dispatched warnings
-└── models/
-    ├── glof_risk_model.pkl     # XGBoost Model
-    ├── glof_risk_model_rf.pkl  # RandomForest Model
-    ├── feature_cols.pkl
-    └── metrics.json            # Model evaluation metrics
-```
+│   ├── historical_varunx_data.csv   # Historical Training Dataset
+│   ├── alerts_history.json          # Live Dispatched Alert Logs
+│   └── glacial_lakes_inventory/     # Shapefiles of High-Risk Himalayan Lakes
+├── models/
+│   ├── varunx_risk_model.pkl        # Production XGBoost Classifier
+│   ├── varunx_risk_model_rf.pkl     # Production Random Forest Classifier
+│   ├── feature_cols.pkl             # Feature Columns Metadata
+│   └── metrics.json                 # Model Performance Evaluation Metrics
+├── schemas/
+│   └── sensor_data.py         # Pydantic Schemas & Data Validation Models
+└── utils/
+    ├── alert_dispatcher.py    # ITU-T CAP v1.2 XML & Emergency Broadcast Gateway
+    ├── data_generator.py      # Stochastic Physics-Based Telemetry Generator
+    ├── gis_mapper.py          # Spatial Cartography & GeoJSON Layer Builder
+    └── telemetry_stream.py    # Autonomous Async Data Stream Manager
+`
 
 ---
 
-## 🧠 5-Level Architecture Progression Framework
-1. **Level 1 (Static Geospatial Integration)**: Grounded on verified historical datasets (ISRO NRSC Landslide Atlas, GSI NLSM).
-2. **Level 2 (Feature Engineering)**: Multi-dimensional environmental matrix fusing Bhuvan DEM elevation/slope with IMD gridded rainfall for Antecedent Moisture Condition (AMC).
-3. **Level 3 (Supervised ML Architecture)**: XGBoost/RandomForest risk engine trained dynamically on learned environmental thresholds.
-4. **Level 4 (Live Telemetry & API Fusion)**: Open-Meteo weather forecasts + MQTT cloud broker for physical IoT sensors.
-5. **Level 5 (Dynamic Risk & CAP Warnings)**: Rate-of-change dynamic lead times + ITU CAP v1.2 XML alert dispatch for NDMA Sanchar Saathi broadcast.
+## 👥 Team & Acknowledgments
+- **Project:** VarunX (VarunaX) Disaster Early Warning System
+- **Hackathon:** Smart India Hackathon (SIH) 2026
+- **Problem Code:** SIH26192
+- **Target Organization:** Ministry of Home Affairs (MHA), National Disaster Response Force (NDRF), National Disaster Management Authority (NDMA).

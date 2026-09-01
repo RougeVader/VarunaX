@@ -34,20 +34,20 @@ CATCHMENT_ZONES_DATABASE = {
             {"name": "Singtam Floodplain Settlement", "lat": 27.2333, "lon": 88.5000, "distance_km": 45, "type": "Urban Ward", "population": 8900}
         ]
     },
-    "Solukhumbu Hilly Catchment (Everest Region)": {
-        "lat": 27.8900, "lon": 86.8333, "elevation": 4350, "state": "Solukhumbu", "district": "High Himalaya",
+    "Alaknanda Basin (Chamoli & Joshimath Corridor)": {
+        "lat": 30.5500, "lon": 79.5667, "elevation": 2850, "state": "Uttarakhand", "district": "Chamoli",
         "vulnerable_wards": [
-            {"name": "Dingboche Village Ward", "lat": 27.8800, "lon": 86.8200, "distance_km": 4, "type": "Hilly Settlement", "population": 1500},
-            {"name": "Phakding River Corridor", "lat": 27.7500, "lon": 86.7167, "distance_km": 22, "type": "River Corridor Settlement", "population": 2100},
-            {"name": "Lukla Valley Ward", "lat": 27.6869, "lon": 86.7314, "distance_km": 30, "type": "Transportation Hub", "population": 3800}
+            {"name": "Tapovan Hydro Barrage Reach", "lat": 30.4900, "lon": 79.6200, "distance_km": 4, "type": "Hydroelectric Infrastructure", "population": 2200},
+            {"name": "Joshimath Subsidence Ward", "lat": 30.5550, "lon": 79.5630, "distance_km": 8, "type": "High Slope Town & Subsidence Zone", "population": 16500},
+            {"name": "Vishnuprayag Confluence Ward", "lat": 30.5630, "lon": 79.5780, "distance_km": 14, "type": "River Confluence Settlement", "population": 3400}
         ]
     },
-    "Rolwaling Valley Catchment": {
-        "lat": 27.8333, "lon": 86.4333, "elevation": 4180, "state": "Dolakha", "district": "Rolwaling",
+    "Beas River Valley (Kullu-Manali Catchment)": {
+        "lat": 32.2396, "lon": 77.1887, "elevation": 2050, "state": "Himachal Pradesh", "district": "Kullu",
         "vulnerable_wards": [
-            {"name": "Na Village Ward", "lat": 27.8200, "lon": 86.4200, "distance_km": 3, "type": "High Slope Village", "population": 800},
-            {"name": "Beding Slope Settlement", "lat": 27.8000, "lon": 86.3833, "distance_km": 10, "type": "Landslide Hazard Ward", "population": 1400},
-            {"name": "Khimti Hydropower Station", "lat": 27.6167, "lon": 86.1333, "distance_km": 35, "type": "Power Grid", "population": 2200}
+            {"name": "Old Manali Riverside Ward", "lat": 32.2530, "lon": 77.1750, "distance_km": 3, "type": "Commercial & Tourism Hub", "population": 8500},
+            {"name": "Bahang Highway Inundation Sector", "lat": 32.2700, "lon": 77.1850, "distance_km": 7, "type": "National Highway Corridor", "population": 3200},
+            {"name": "Kullu Right-Bank Floodplain", "lat": 31.9578, "lon": 77.1095, "distance_km": 38, "type": "Dense Valley Settlement", "population": 24000}
         ]
     },
     "Lahaul Valley (Chandra-Bhaga River)": {
@@ -70,12 +70,7 @@ def get_risk_color(risk_level: int) -> str:
     return colors.get(risk_level, "#0d6efd")
 
 
-def create_plotly_gis_map(selected_zone: str, current_risk_level: int, water_level: float, discharge: float):
-    """
-    Generate an interactive Plotly Map for VarunX showing Hilly Catchment Zones,
-    highlighting the active zone with live risk markers and downstream vulnerability points.
-    Compatible across Plotly 5.x, 6.x, and 7.x versions.
-    """
+def create_plotly_gis_map(selected_zone: str = None, current_risk_level: int = 0, current_water_level: float = 0.0, current_ground_movement: float = 0.0, is_dark: bool = False):
     records = []
     
     for name, info in CATCHMENT_ZONES_DATABASE.items():
@@ -101,11 +96,15 @@ def create_plotly_gis_map(selected_zone: str, current_risk_level: int, water_lev
         return df
 
     color_map = {
-        "LOW": "#28a745",
-        "MEDIUM": "#ffc107",
-        "HIGH": "#fd7e14",
-        "CRITICAL": "#dc3545"
+        "LOW": "#16A34A",
+        "MEDIUM": "#D97706",
+        "HIGH": "#EA580C",
+        "CRITICAL": "#DC2626"
     }
+
+    map_style = "carto-darkmatter" if is_dark else "carto-positron"
+    bg_color = "#161B26" if is_dark else "#FFFFFF"
+    text_color = "#F8FAFC" if is_dark else "#0F172A"
 
     # Plotly 7.0+ uses px.scatter_map instead of px.scatter_mapbox
     if hasattr(px, "scatter_map"):
@@ -166,7 +165,7 @@ def create_plotly_gis_map(selected_zone: str, current_risk_level: int, water_lev
             mode="markers+text",
             lat=target_lats,
             lon=target_lons,
-            marker=dict(size=13, color="purple"),
+            marker=dict(size=13, color="#8B5CF6" if is_dark else "#7C3AED"),
             text=target_names,
             textposition="bottom right",
             name="Vulnerable Downstream Wards"
@@ -177,14 +176,23 @@ def create_plotly_gis_map(selected_zone: str, current_risk_level: int, water_lev
                 mode="lines",
                 lat=[zone_lat, target["lat"]],
                 lon=[zone_lon, target["lon"]],
-                line=dict(width=3, color="red" if current_risk_level >= 2 else "orange"),
+                line=dict(width=3, color="#DC2626" if current_risk_level >= 2 else "#EA580C"),
                 name=f"Flood & Debris Flow Path: {target['name']}"
             ))
     
+    if hasattr(fig.layout, "map"):
+        fig.update_layout(map_style="carto-darkmatter")
+    elif hasattr(fig.layout, "mapbox"):
+        fig.update_layout(mapbox_style="carto-darkmatter")
+        
     fig.update_layout(
         height=480,
         margin=dict(l=0, r=0, t=35, b=0),
-        legend=dict(orientation="h", y=1.02, x=0.1)
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#94A3B8"),
+        legend=dict(orientation="h", y=1.02, x=0.1, font=dict(color="#94A3B8")),
+        uirevision="varunx_map_lock"
     )
     
     return fig

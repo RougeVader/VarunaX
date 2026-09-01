@@ -1,0 +1,133 @@
+================================================================================
+VarunX: ML Risk Engine — Model Training & Prerequisites Guide
+Smart India Hackathon 2026 · Problem Statement: SIH26192
+Ministry of Home Affairs (NDRF, DM Division)
+================================================================================
+
+1. OVERVIEW
+--------------------------------------------------------------------------------
+The VarunX Early Warning System uses a multi-class machine learning risk engine
+(XGBoost + RandomForest) trained on 10 physical and meteorological parameters
+to classify real-time catchment hazard into 4 operational alert levels:
+  - Level 0: Low Risk (Green)
+  - Level 1: Medium Risk (Yellow)
+  - Level 2: High Risk (Orange)
+  - Level 3: Critical Risk (Red) — Urgent Evacuation
+
+This guide provides all prerequisites, environment setup instructions, and
+commands to train and export the models locally utilizing your NVIDIA RTX 3050 GPU.
+
+
+================================================================================
+2. HARDWARE & SYSTEM PREREQUISITES
+================================================================================
+- OS: Windows 10 / 11 (64-bit)
+- Python Version: Python 3.10, 3.11, or 3.12 (64-bit)
+- GPU: NVIDIA GeForce RTX 3050 (or any CUDA-capable NVIDIA GPU)
+- NVIDIA Drivers: Version 528.xx or higher
+- (Optional for GPU check): CUDA Toolkit 11.8 or 12.x + PyTorch with CUDA
+
+
+================================================================================
+3. PYTHON PACKAGES & DEPENDENCIES
+================================================================================
+The following Python packages must be installed:
+
+Core ML & Data Processing:
+  - numpy >= 1.24.0
+  - pandas >= 2.0.0
+  - scikit-learn >= 1.3.0
+  - xgboost >= 2.0.0 (Supports native GPU via device="cuda")
+  - joblib >= 1.3.0
+
+Dashboard & Validation:
+  - streamlit >= 1.35.0
+  - plotly >= 5.18.0
+  - pydantic >= 2.0.0
+  - requests >= 2.31.0
+
+Installation Command:
+  Open PowerShell in the VArunX folder and run:
+  
+  pip install -r requirements.txt
+
+
+================================================================================
+4. STEP-BY-STEP TRAINING INSTRUCTIONS
+================================================================================
+
+Step 1: Open PowerShell / Terminal
+--------------------------------------------------------------------------------
+Navigate to the project root folder:
+  cd "C:\Users\Ayush Khandwe\Desktop\glof_ews_project new\VArunX"
+
+
+Step 2: (Optional) Activate Virtual Environment
+--------------------------------------------------------------------------------
+If you are using a virtual environment:
+  .\.venv\Scripts\Activate.ps1
+
+
+Step 3: Run the Training Script
+--------------------------------------------------------------------------------
+Execute the automated training script:
+  python train_model.py
+
+What this script does automatically:
+  1. Generates the realistic historical flash-flood & landslide synthetic dataset 
+     and saves it to: data/historical_varunx_data.csv
+  2. Detects your NVIDIA RTX 3050 GPU and enables CUDA acceleration (tree_method="hist", device="cuda").
+  3. Trains the primary XGBoost Classifier and secondary RandomForest Classifier.
+  4. Evaluates accuracy, multi-class ROC-AUC, confusion matrix, and feature importances.
+  5. Exports all model binaries and evaluation metrics to the models/ folder.
+
+
+================================================================================
+5. GENERATED ARTIFACTS & OUTPUTS
+================================================================================
+After training completes, the following files will be created/updated:
+
+1. Dataset:
+   - data/historical_varunx_data.csv (2,500 samples with 10 PRD sensor columns)
+
+2. Model Weights & Feature Registry:
+   - models/varunx_risk_model.pkl     -> Primary XGBoost classifier
+   - models/varunx_risk_model_rf.pkl  -> RandomForest backup classifier
+   - models/feature_cols.pkl          -> Serialized list of 10 input feature names
+
+3. Performance Metrics:
+   - models/metrics.json              -> Accuracy, ROC-AUC, Confusion Matrix, 
+                                         and Feature Importances for the ML Studio tab.
+
+
+================================================================================
+6. FEATURE SET & PHYSICAL PARAMETERS
+================================================================================
+The models are trained strictly on the 10 VarunX physical parameters:
+
+1.  rainfall_1h_mm       : 1-hour rainfall intensity (mm)
+2.  rainfall_3h_mm       : 3-hour cumulative precipitation (mm)
+3.  rainfall_24h_mm      : 24-hour cumulative precipitation (mm)
+4.  flow_water_level_m   : River / valley gauge water depth (meters)
+5.  water_level_rate_m_h : Rate of change of water level (m/hour)
+6.  slope_movement_mm    : Hillside displacement / inclinometer reading (mm)
+7.  tilt_rate_mm_h       : Rate of ground displacement (mm/hour)
+8.  discharge_m3s        : Water discharge rate (m³/s)
+9.  air_temp_c           : Ambient air temperature (°C)
+10. surface_temp_c       : Soil / surface temperature (°C)
+
+
+================================================================================
+7. VERIFICATION IN STREAMLIT DASHBOARD
+================================================================================
+To verify that the model is functioning and view the live performance curves:
+
+1. Launch the application:
+   streamlit run app.py
+
+2. In your browser (http://localhost:8501):
+   - Switch to the "ML Model Studio" tab on the sidebar.
+   - Inspect the Accuracy (~98%), ROC-AUC (~0.99), Feature Importance chart,
+     and Confusion Matrix.
+   - Test live predictions in the "Live Monitoring" tab.
+================================================================================

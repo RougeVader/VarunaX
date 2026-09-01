@@ -69,47 +69,47 @@
   "feature_importances": [
     {
       "feature": "discharge_m3s",
-      "importance": 0.6773499250411987
+      "importance": 0.6672863364219666
     },
     {
       "feature": "slope_movement_mm",
-      "importance": 0.22462283074855804
-    },
-    {
-      "feature": "tilt_rate_mm_h",
-      "importance": 0.03410642594099045
+      "importance": 0.2485959380865097
     },
     {
       "feature": "flow_water_level_m",
-      "importance": 0.030284516513347626
+      "importance": 0.02771131508052349
+    },
+    {
+      "feature": "tilt_rate_mm_h",
+      "importance": 0.025784697383642197
     },
     {
       "feature": "water_level_rate_m_h",
-      "importance": 0.011531614698469639
-    },
-    {
-      "feature": "rainfall_24h_mm",
-      "importance": 0.007518884260207415
-    },
-    {
-      "feature": "rainfall_3h_mm",
-      "importance": 0.00618407316505909
-    },
-    {
-      "feature": "rainfall_1h_mm",
-      "importance": 0.003191813128069043
+      "importance": 0.012603717856109142
     },
     {
       "feature": "air_temp_c",
-      "importance": 0.003129302989691496
+      "importance": 0.005606360267847776
+    },
+    {
+      "feature": "rainfall_24h_mm",
+      "importance": 0.004016163758933544
+    },
+    {
+      "feature": "rainfall_1h_mm",
+      "importance": 0.0034688017331063747
     },
     {
       "feature": "surface_temp_c",
-      "importance": 0.0020807317923754454
+      "importance": 0.0025488303508609533
+    },
+    {
+      "feature": "rainfall_3h_mm",
+      "importance": 0.0023778174072504044
     }
   ],
   "total_samples": 2500,
   "train_samples": 2000,
   "test_samples": 500,
-  "trained_at": "2026-09-01 11:13:09"
+  "trained_at": "2026-09-01 20:51:01"
 }

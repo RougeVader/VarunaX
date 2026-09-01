@@ -1,5 +1,28 @@
 [
   {
+    "alert_id": "VARUNX-ALT-20260901233409-EA0F",
+    "timestamp": "2026-09-01 23:34:09",
+    "catchment_zone": "Kedarnath Valley (Mandakini Catchment)",
+    "risk_level": 3,
+    "risk_label": "CRITICAL",
+    "lead_time_hours": 2.5,
+    "trigger_reason": "24h Rainfall 190mm, Slope Displacement 85mm",
+    "channels": [
+      "SMS",
+      "Email",
+      "Webhook",
+      "NDMA_CAP_XML"
+    ],
+    "recipients": [
+      "NDRF Control Room (DM Division)",
+      "State Disaster Management Authority (SDMA)",
+      "District Collectorate",
+      "Village Emergency Response Teams"
+    ],
+    "message_body": "\ud83d\udea8 VarunX EMERGENCY FLASH FLOOD & LANDSLIDE WARNING \ud83d\udea8\nTarget Zone / Ward: Kedarnath Valley (Mandakini Catchment)\nThreat Severity: CRITICAL RISK\nEstimated Evacuation Lead Time: 2.5 Hours\nPrimary Driver: 24h Rainfall 190mm, Slope Displacement 85mm\nAction Required: NDRF & SDMA Control Rooms \u2014 Initiate immediate village/ward level evacuation and emergency warnings. Deploy field teams to slope displacement points.",
+    "status": "DISPATCHED"
+  },
+  {
     "alert_id": "VARUNX-ALT-20260901111309-BE6B",
     "timestamp": "2026-09-01 11:13:09",
     "catchment_zone": "Kedarnath Valley (Mandakini Catchment)",
@@ -138,25 +161,26 @@
     "status": "DISPATCHED"
   },
   {
-    "alert_id": "GLOF-ALT-20260830005947-0A74",
+    "alert_id": "VARUNX-ALT-20260830005947-0A74",
     "timestamp": "2026-08-30 00:59:47",
-    "lake_id": "South Lhonak (Sikkim)",
+    "catchment_zone": "Teesta Basin (North Sikkim Catchment)",
     "risk_level": 3,
     "risk_label": "CRITICAL",
-    "lead_time_hours": 2.5,
-    "trigger_reason": "Rapid water level rise (0.45 m/h) and dam tilt rate (0.92 deg/h)",
+    "lead_time_hours": 2.0,
+    "trigger_reason": "High 24h rainfall (160mm) and rapid slope displacement (52mm)",
     "channels": [
       "SMS",
       "Email",
-      "Webhook"
+      "Webhook",
+      "NDMA_CAP_XML"
     ],
     "recipients": [
-      "NDMA Control Room (Delhi)",
-      "State Disaster Authority (SDMA)",
+      "NDRF Control Room (DM Division)",
+      "State Disaster Management Authority (SDMA)",
       "District Collectorate",
       "Local Emergency Response Teams"
     ],
-    "message_body": "\ud83d\udea8 EMERGENCY GLOF WARNING \ud83d\udea8\nLocation: South Lhonak (Sikkim)\nThreat Level: CRITICAL RISK\nEstimated Evacuation Window: 2.5 Hours\nKey Trigger: Rapid water level rise (0.45 m/h) and dam tilt rate (0.92 deg/h)\nAction Required: Initiate immediate downstream village warning & evacuation protocols. Contact NDMA / SDMA Control Room immediately.",
+    "message_body": "\ud83d\udea8 VarunX EMERGENCY FLASH FLOOD & LANDSLIDE WARNING \ud83d\udea8\nTarget Zone / Ward: Teesta Basin (North Sikkim Catchment)\nThreat Severity: CRITICAL RISK\nEstimated Evacuation Lead Time: 2.0 Hours\nPrimary Driver: High 24h rainfall (160mm) and rapid slope displacement (52mm)\nAction Required: NDRF & SDMA Control Rooms \u2014 Initiate immediate downstream village warning & evacuation protocols. Deploy field teams to slope displacement points.",
     "status": "DISPATCHED"
   }
 ]

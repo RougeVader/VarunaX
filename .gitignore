@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.class
+.venv/
+varunx_env/
+env/
+venv/
+.pytest_cache/
+.DS_Store
+Thumbs.db
+data/glacial_lakes_inventory/
+*.shp
+*.dbf
+*.shx
+*.cpg
+*.prj
